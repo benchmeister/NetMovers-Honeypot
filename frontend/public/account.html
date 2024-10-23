@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+
+    <title>Mouses Live! - Account</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+    <link rel="stylesheet" href="assets/css/account.css">
+    <!-- change navbar if user is logged in-->
+    <script>
+      const baseUrl = "http://localhost:3000";
+
+      const token = localStorage.getItem('token');
+      const loggedInUserID = localStorage.getItem("loggedInUserID");
+
+      axios.post(`${baseUrl}/verify/${loggedInUserID}`, {1:1}, {                
+          headers:{
+                  'Authorization': `Bearer ${token}`
+          }
+      })
+          .then((response) => {
+              console.log(response);
+
+              const result = response.data;
+              if(result.success == 1){
+                html = `
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Home
+                </a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="products.html">Our Products</a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="/account/${loggedInUserID}">Account
+                  <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" onclick="logout()" href="#">Logout</a>
+              </li>
+            </ul>
+          </div>`
+               document.getElementById('navbarResponsive').outerHTML = html
+
+              }
+          })
+          .catch((error) => {
+              console.log("should not be seen")
+          })
+
+      function logout(){
+          window.localStorage.clear();
+          window.location.assign("/");
+      }
+    </script>
+    <script>
+      const id2 = parseInt(localStorage.getItem("loggedInUserID"))
+      if(!id2){
+          window.location.assign("/")
+      }
+      else{
+          axios.get(`http://localhost:3000/account/${id2}`, {
+              headers:{
+                  'Authorization':`Bearer ${token}`
+              }
+          })
+              .then((response) => {
+                  console.log(response)
+    
+                  data = response.data
+    
+                  html1 = `<input type = "text" id = "username" value="${data.username}"> </br></p>`
+                  document.getElementById("username").outerHTML = html1
+    
+                  html2 = `<input type = "text" id = "firstname" value="${data.firstname}"> </br></p>`
+                  document.getElementById("firstname").outerHTML = html2
+    
+                  html3 = `<input type = "text" id = "lastname" value="${data.lastname}"> </br></p>`
+                  document.getElementById("lastname").outerHTML = html3
+    
+                  html4 = `<input type = "text" id = "email" value='${data.email}'> </p>`
+                  document.getElementById("email").outerHTML = html4
+              })
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+
+    <!-- Header -->
+    <header class="">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="index.html"><h2>Mouses <em>Live</em></h2></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Home</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="products.html">Our Products</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="login.html">Login/Register</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+
+    <!-- Page Content -->
+    <div class="page-heading contact-heading header-text">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="text-content">
+              <h4>Account Details</h4>
+              <h2>The Information We Protect</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="find-us">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="section-heading">
+              <h2>Account</h2>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="account-details">
+              <p class = "username"> <label>Username: </label>
+                <input type = "text" id = "username"> </br></p>
+
+              <p class = "firstname"> <label>First name: </label>
+                <input type = "text" id = "firstname"> </br></p>    
+                
+              <p class = "lastname"> <label>Last name: </label>
+                <input type = "text" id = "lastname"> </br></p>
+
+              <p class="email"><label>Email: </label>
+                <input type = "text" id = "email"> </p>
+    
+              <p class="password"><label>New Password: </label>
+                <input type = "password" id = "pwd" placeholder="Your old password will not be shown here, enter a new one"> </p>
+              
+              <p><input class="filled-button" type = "button" id = "Update" onclick=update() value = "Update Profile" /></p>
+              <p><input class="filled-button" type = "button" id = "Logout" onclick=logout() value = "Log Out" /></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="inner-content">
+              <p>Copyright &copy; 2021 Mouses Live Pte Ltd.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+
+<!-- Script to update user information -->
+<script>
+      function update(){
+          var tmpUName = $('#username').val();
+          var tmpFirst = $('#firstname').val();
+          var tmpLast = $('#lastname').val();
+          var tmpEmail = $('#email').val();
+          var tmpPwd = $('#pwd').val();
+          var tmpToken = localStorage.getItem('token');
+          var datapack = {
+              myUsername : tmpUName,
+              myEmail    : tmpEmail,
+              myFirst    : tmpFirst,
+              myLast     : tmpLast,
+              myPass     : tmpPwd
+              };
+
+          console.log(datapack)
+
+          axios.put(`http://localhost:3000/account/${id2}`, datapack, {
+              headers:{
+                  'Authorization' : `Bearer ${token}`
+              }
+          })
+              .then((response) => {
+                  console.log(response)
+                  data = response.data
+                  window.location.reload()
+                    
+              })
+              .catch((error) => {
+                  console.log(error)
+                  if(String(error) == 'Error: Request failed with status code 422'){
+                      $('#msg').html('Please enter a unique username')
+                  }
+                  else{
+                      $('#msg').html(error)
+                  }
+                    
+              })
+      }
+</script>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Additional Scripts -->
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/owl.js"></script>
+    <script src="assets/js/slick.js"></script>
+    <script src="assets/js/isotope.js"></script>
+    <script src="assets/js/accordions.js"></script>
+
+
+    <script language = "text/Javascript"> 
+      cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+      function clearField(t){                   //declaring the array outside of the
+      if(! cleared[t.id]){                      // function makes it static and global
+          cleared[t.id] = 1;  // you could use true and false, but that's more typing
+          t.value='';         // with more chance of typos
+          t.style.color='#fff';
+          }
+      }
+    </script>
+
+
+  </body>
+
+</html>

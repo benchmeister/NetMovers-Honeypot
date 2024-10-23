@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+
+    <title>Mouses Live! - Login/Register</title>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+    <link rel="stylesheet" href="assets/css/personal.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Redirect to home page if logged in-->
+    <script>
+      const baseUrl = "https://mouses.live:3000";
+      const token = localStorage.getItem('token');
+      const loggedInUserID = localStorage.getItem("loggedInUserID");
+
+      axios.post(`${baseUrl}/verify/${loggedInUserID}`, {1:1}, {                
+          headers:{
+                  'Authorization': `Bearer ${token}`
+          }
+      })
+          .then((response) => {
+              console.log(response);
+
+              const result = response.data;
+              if(result.success == 1){
+                window.assign.location('/')
+              }
+          })
+          .catch((error) => {
+              console.log("should not be seen")
+          })
+
+    </script>
+
+  </head>
+
+  <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+
+    <!-- Page Content -->
+      <!--Actual Body-->
+    <div class="login-page">
+      <div class="form">
+        <h2>Welcome to Mouses Live!</h2>
+        <p class="error-message"></p>
+
+        <!--Register Form-->
+        <form class="register-form">
+          <input type="text" placeholder="Username" id="reg_username"/>
+          <input type="text" placeholder="Email Address" id="reg_email"/>
+          <input type="text" placeholder="First Name" id="reg_firstname"/>
+          <input type="text" placeholder="Last Name" id="reg_lastname"/>
+          <input type="password" placeholder="Password" id="reg_password"/>
+          <button type="submit" id="Register">Create</button>
+          <p class="message">Already registered? <a href="#">Sign In</a></p>
+        </form>
+
+        <!--Login Form-->
+        <form class="login-form">
+          <input required="required" id="username" type="text" placeholder="username"/>
+          <input required="required" id="pwd" type="password" placeholder="Password"/>
+          <button type="submit" id="Login">Login</button>
+          <p class="message">Not registered? <a href="#">Create an account</a></p>
+        </form>
+      </div>
+    </div>
+    
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="inner-content">
+              <p>Copyright &copy; 2021 Mouses Live Pte Ltd.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+   
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Additional Scripts -->
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/owl.js"></script>
+    <script src="assets/js/slick.js"></script>
+    <script src="assets/js/isotope.js"></script>
+    <script src="assets/js/accordions.js"></script>
+
+
+    <script language = "text/Javascript"> 
+      cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+      function clearField(t){                   //declaring the array outside of the
+      if(! cleared[t.id]){                      // function makes it static and global
+          cleared[t.id] = 1;  // you could use true and false, but that's more typing
+          t.value='';         // with more chance of typos
+          t.style.color='#fff';
+          }
+      }
+    </script>
+
+<script>
+  $(".login-form").submit((event) => {
+      // prevent page reload
+      event.preventDefault();
+
+      const my_username = $("#username").val();
+      const my_password = $("#pwd").val();
+
+      const requestBody = {
+          username: my_username,
+          password: my_password
+      };
+
+      axios.post(`${baseUrl}/login/`, requestBody)
+          .then((response) => {
+              console.log(response);
+
+              const result = response.data
+
+              if(result.success == 0){
+                $(".error-message").replaceWith(`<p class="alert alert-danger error-message">Incorrect Username or Password!</p>`)
+              }
+              else{
+                  const token = result.token;
+                  const loggedInUserID = result.user_id;
+                  console.log(loggedInUserID)
+                  localStorage.setItem("token", token);
+                  localStorage.setItem("loggedInUserID", loggedInUserID);
+                  window.location.href = "/";
+              }
+          })
+          .catch((error) => {
+                $(".error-message").replaceWith(`<p class="alert alert-danger error-message">Incorrect Username or Password!</p>`)
+          });
+  });
+</script>
+
+<script>
+  $(".register-form").submit((event) => {
+      // prevent page reload
+      event.preventDefault();
+      console.log(baseUrl)
+      const my_username = $("#reg_username").val();
+      const my_password = $("#reg_password").val();
+      const my_email = $("#reg_email").val();
+      const first_name = $("#reg_firstname").val();
+      const last_name = $("#reg_lastname").val();
+
+      const requestBody = {
+          username: my_username,
+          password: my_password,
+          email: my_email,
+          firstName: first_name,
+          lastName: last_name
+      };
+
+      console.log(requestBody)
+      axios.post(`${baseUrl}/users/`, requestBody)
+          .then((response) => {
+              console.log(response);
+
+              const result = response.data
+
+              if(result.success == 0){
+                $(".error-message").replaceWith(`<p class="alert alert-danger error-message">Registration Failed</p>`)
+              }
+              else{
+                  const token = result.token;
+                  const loggedInUserID = result.user_id;
+                  localStorage.setItem("token", token);
+                  localStorage.setItem("loggedInUserID", loggedInUserID);
+                  window.location.href = "/";
+              }
+          })
+          .catch((error) => {
+              //$("#message").html(error);
+              $(".error-message").replaceWith(`<p class="alert alert-danger error-message">Registration Failed</p>`)
+              console.log(error);
+          });
+  });
+</script>
+  </body>
+
+</html>

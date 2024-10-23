@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+
+    <title>Mouses Live! - Products</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- change navbar if user is logged in-->
+    <script>
+        const baseUrl = "https://mouses.live:3000";
+  
+        const token = localStorage.getItem('token');
+        const loggedInUserID = localStorage.getItem("loggedInUserID");
+  
+        axios.post(`${baseUrl}/verify/${loggedInUserID}`, {1:1}, {                
+            headers:{
+                    'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((response) => {
+                console.log(response);
+  
+                const result = response.data;
+                if(result.success == 1){
+                  html = `
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+              <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.html">Home
+                  </a>
+                </li> 
+                <li class="nav-item active">
+                  <a class="nav-link" href="products.html">Our Products
+                    <span class="sr-only">(current)</span></a>
+                  
+                </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="/account/${loggedInUserID}">Account
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" onclick="logout()" href="#">Logout</a>
+                </li>
+              </ul>
+            </div>`
+                 document.getElementById('navbarResponsive').outerHTML = html
+  
+                }
+            })
+            .catch((error) => {
+                console.log("should not be seen")
+            })
+  
+        function logout(){
+            window.localStorage.clear();
+            window.location.assign("/");
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/item.css">
+    
+    </head>
+
+    <body>
+        <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div biv>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+
+    <!-- Header -->
+    <header class="">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="index.html"><h2>Mouses <em>Live</em></h2></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Home</a>
+              </li> 
+              <li class="nav-item active">
+                <a class="nav-link" href="products.html">Our Products
+                  <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="login.html">Login/Register</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-heading products-heading header-text"></div>
+    <div class="find-us">
+        <div class="container">
+          <div class="row specific_product">
+            <div class="col-md-12 section-heading">
+            </div>
+        </div>
+      </div>
+
+    <footer>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="inner-content">
+                <p>Copyright &copy; 2021 Mouses Live Pte Ltd.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </footer>
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Additional Scripts -->
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/owl.js"></script>
+    <script src="assets/js/slick.js"></script>
+    <script src="assets/js/isotope.js"></script>
+    <script src="assets/js/accordions.js"></script>
+
+
+    <script language = "text/Javascript"> 
+      cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+      function clearField(t){                   //declaring the array outside of the
+      if(! cleared[t.id]){                      // function makes it static and global
+          cleared[t.id] = 1;  // you could use true and false, but that's more typing
+          t.value='';         // with more chance of typos
+          t.style.color='#fff';
+          }
+      }
+    </script>
+    
+
+  </body>
+  <script>
+    var productid = location.search.substring(1).split("=")[1]
+    axios.get(`${baseUrl}/product/${productid}`, {1:1})
+      .then((response)=>{
+        const products = response.data
+        products.forEach((product)=>{
+          const heading=`
+                <h2>${product.name}</h2>
+                </div>
+              `
+          $(".section-heading").append(heading)
+          const listing = ` 
+            <div class="col-md-4">
+                <img class="product_image" src="assets/images/${product.image_url}"/>
+            </div>
+            <div class="col-md-8">
+                <h3>$${product.price}</h3>
+                <p class="description">${product.description}</p>
+                <a href="order.html?productid=${product.productid}" class="filled-button">Place Your Order Now!</a>
+            </div>
+          `
+          $(".specific_product").append(listing)
+        })
+      })
+      .catch((error)=>{
+        console.log(error)
+      })
+  </script>
+</html>

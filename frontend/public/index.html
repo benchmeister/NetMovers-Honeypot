@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <title>Mouses Live! - Home</title>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/mouse.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon-32x32.png" />
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- change navbar if user is logged in-->
+    <script>
+      const baseUrl = "https://mouses.live:3000";
+
+      const token = localStorage.getItem('token');
+      const loggedInUserID = localStorage.getItem("loggedInUserID");
+
+      axios.post(`${baseUrl}/verify/${loggedInUserID}`, {1:1}, {                
+          headers:{
+                  'Authorization': `Bearer ${token}`
+          }
+      })
+          .then((response) => {
+              console.log(response);
+
+              const result = response.data;
+              console.log(result)
+              if(result.success == 1){
+                html = `
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home
+                  <span class="sr-only">(current)</span>
+                </a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="products.html">Our Products</a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="/account/${loggedInUserID}">Account
+
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" onclick="logout()" href="#">Logout</a>
+              </li>
+            </ul>
+          </div>`
+               document.getElementById('navbarResponsive').outerHTML = html
+
+              }
+          })
+          .catch((error) => {
+              console.log("should not be seen")
+          })
+
+      function logout(){
+          window.localStorage.clear();
+          window.location.assign("/");
+      }
+    </script>
+    <script>
+      axios.get(`${baseUrl}/featured`, {1:1})
+        .then((response)=>{
+          const products = response.data
+          products.forEach((product)=>{
+            const listing=`
+            <div class="col-md-4">
+              <div class="product-item">
+                <a href="item.html?productid=${product.productid}"><img src="assets/images/${product.image_url}" alt=""></a>
+                <div class="down-content">
+                  <a href="item.html?productid=${product.productid}"><h4>${product.name}</h4></a>
+                  <h6>$${product.price}</h6>
+                  <p>${product.oneline}</p>
+                </div>
+              </div>
+            </div>
+            `
+            $(".latest_products").append(listing)
+          })
+        })
+        .catch((error)=>{
+          console.log(error)
+        })
+    </script>
+  </head>
+
+  <body>
+    <!--
+      Testing ONLY! REMOVE WHEN DEPLOYED!!!!!!!
+      Bastion Host IP: 13.212.116.195 
+    -->
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+
+    <!-- Header -->
+    <header class="">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="index.html"><h2>Mouses <em>Live</em></h2></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home
+                  <span class="sr-only">(current)</span>
+                </a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="products.html">Our Products</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="login.html">Login/Register</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+  
+    <!-- Page Content -->
+    <!-- Banner Starts Here -->
+    <div class="banner header-text">
+      <div class="owl-banner owl-carousel">
+        <div class="banner-item-01">
+          <div class="text-content">
+            <h4>GAMING MICE</h4>
+            <h2>Elevating your game</h2>
+          </div>
+        </div>
+        <div class="banner-item-02">
+          <div class="text-content">
+            <h4>Cheap prices</h4>
+            <h2>Best bang for your buck</h2>
+          </div>
+        </div>
+        <div class="banner-item-03">
+          <div class="text-content">
+            <h4>Ever-Changing</h4>
+            <h2>New stock and products everyday</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Banner Ends Here -->
+
+    <div class="latest-products">
+      <div class="container">
+        <div class="row latest_products">
+          <div class="col-md-12">
+            <div class="section-heading">
+              <h2>Latest Products</h2>
+              <a href="products.html">view all products <i class="fa fa-angle-right"></i></a>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="best-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="section-heading">
+              <h2>About Mouses Live</h2>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="left-content">
+              <h4>Looking for the best products?</h4>
+              <p>We strive to give you the best gaming mice at the most competitive prices so you are able to beat the competition and outpace the pack. With new stock arrivals everyday, you can look forward to a mouse for every occassion and every need. Checkout our instagram below and follow to be updated on latest releases!</p>
+              <a href="https://www.instagram.com/mouseslive/" target="_blank" class="filled-button">Our Instagram</a>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="right-image">
+              <img src="assets/images/feature-image.jpg" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="inner-content">
+              <p>Copyright &copy; 2021 Mouses Live Pte Ltd</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Additional Scripts -->
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/owl.js"></script>
+    <script src="assets/js/slick.js"></script>
+    <script src="assets/js/isotope.js"></script>
+    <script src="assets/js/accordions.js"></script>
+
+
+    <script language = "text/Javascript"> 
+      cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+      function clearField(t){                   //declaring the array outside of the
+      if(! cleared[t.id]){                      // function makes it static and global
+          cleared[t.id] = 1;  // you could use true and false, but that's more typing
+          t.value='';         // with more chance of typos
+          t.style.color='#fff';
+          }
+      }
+    </script>
+
+
+  </body>
+
+</html>

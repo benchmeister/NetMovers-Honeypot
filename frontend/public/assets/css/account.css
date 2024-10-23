@@ -1,0 +1,9 @@
+.account-details p{
+    margin:0;
+    padding:0.5%;
+    border-bottom: 0;
+    line-height: 0;
+  }
+.account-details p input{
+    line-height:24px;
+}

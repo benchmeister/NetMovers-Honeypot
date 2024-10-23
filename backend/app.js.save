@@ -1,0 +1,319 @@
+const express = require("express");
+const app = express();
+var morgan = require('morgan')
+var fs = require('fs')
+var https = require('https');
+// import the models
+const User = require('./model/user.js');
+const Prod = require("./model/prod.js");
+
+// import body-parser and multer middleware
+const bodyParser = require("body-parser");
+const multer = require('multer');
+const cors = require("cors");
+app.use(cors());
+
+//Jsonwebtoken
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = require("./config.js"); 
+const isLoggedInMiddleware = require("./isLoggedInMiddleware.js");
+const product = require("./model/prod.js");
+
+// use the middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+var accessLogStream = fs.createWriteStream('./access.log', {flags:'a'})
+app.use(morgan('combined', {stream:accessLogStream}))
+
+//Test
+app.get("/", (req, res) => {
+   res.send("Connection Success!")
+});
+
+//Add new user to database
+app.post("/users/", (req, res, next) => {
+
+    var user = {
+      username : req.body.username,
+      password : req.body.password,
+      email : req.body.email,
+      first : req.body.firstName,
+      last : req.body.lastName
+    }
+
+    User.insert(user, (error, user) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send();
+        return;
+      };
+      const payload = { user_id: user };
+      jwt.sign(payload, JWT_SECRET.key, { algorithm: "HS256" }, (error, token) => {
+        if (error) {
+          console.log(error);
+          var output = {
+            success : 0
+          }
+          res.status(401).send(output);
+          return;
+        }
+        res.status(200).send({token: token, user_id: user, admin:"Yes"});
+      })
+    });
+});
+
+//login
+app.post("/login/", function (req, res) {
+
+  var username = req.body.username;
+  var password = req.body.password;
+
+  User.verify(username, password, function (error, user) {
+     if (error) {
+        console.log("app.js::/login::Error occured")
+        res.status(500).send("Login has failed.");
+     }
+     else {
+        if (user === null) {
+           console.log("app.js::/login::User is not found")
+
+           var output = {
+              success : 0,
+           };
+
+           res.status(401).send(output);
+           //return;
+        }
+        else {
+           const payload = {
+              user_id: user.id
+           };
+
+           jwt.sign(payload,JWT_SECRET.key,{ algorithm: "HS256" },
+              function (error, token) {
+                 if (error) {
+                    console.log(error);
+                    console.log("app.js::/login::Token generation failed")
+                    
+                    var output = {
+                       success : 0,
+                    };
+                    res.status(401).send(output);
+                    //return;
+                 }
+                 else {
+                    var output = {
+                       success : 1,
+                       token: token,
+                       user_id: user.id
+                    };
+                    res.status(200).send(output);
+                 }
+
+              })
+        }
+
+     }
+  });
+});
+
+// get user
+app.get('/account/:userid', isLoggedInMiddleware, function (req, res) {
+
+  var id = req.params.userid;
+
+  if (req.decodedToken.user_id !== 0 && parseInt(req.decodedToken.user_id) !== parseInt(id)) {
+    console.log(req.decodedToken.user_id)
+    console.log(id)
+    res.status(403).send();
+    return;
+ }
+
+ else{
+    User.findByID(id, function (err, result){
+       if(!err){
+          if(result){
+            res.status(200).send(result);
+          }
+          else{
+            res.status(404).send("User not found");
+          }
+       } 
+       else{
+           res.status(500).send("Unknown error");
+       }
+   });
+ }
+});
+
+// verify login
+app.post("/verify/:userid", isLoggedInMiddleware, function(req, res){
+
+  var user = parseInt(req.decodedToken.user_id);
+  var user2 = parseInt(req.params.userid);
+
+  if(user == user2 || user == 0){
+     var output = {
+        success : 1,
+     };
+
+     res.send(output)
+     console.log("sent pass")
+  }
+  else{
+     var output = {
+        success : 0,
+     };
+     res.send(output)
+     console.log("sent failed")
+  }
+})
+
+// update user
+app.put('/account/:userID', isLoggedInMiddleware, function(req, res){
+
+  const userID = parseInt(req.params.userID);
+  const user1 = parseInt(req.decodedToken.user_id)
+
+  var myUser = {
+     username: req.body.myUsername,
+     email: req.body.myEmail,
+     first: req.body.myFirst,
+     last: req.body.myLast,
+     password: req.body.myPass
+  }
+  
+  if(userID !== user1 && user1 != 0){
+    res.status(403).send("Not allowed")
+  }
+
+  else{
+    User.editUser(userID, myUser, function (err, result){
+       if(!err){
+          var output = {
+             success : result.affectedRows
+          };
+          if(result){
+             if(result=="UserTaken"){
+                res.status(422).send("Username is already taken!")
+             }
+             else{
+                res.status(204).send(output)
+             }
+          }
+          else{
+             res.status(404).send("User ID can't be found.")
+          }
+       } 
+       else{
+           res.status(500).send("Unknown error");
+       }
+   });
+  }
+});
+
+// Get Products
+app.get('/product/', function (req, res) {
+ 
+   Prod.getall(function (err, result){
+      if(!err){
+         if(result){
+            res.status(200).send(result)
+         }
+         else{
+            res.status(404).send("User not found");
+         }
+      } 
+      else{
+            res.status(500).send("Unknown error");
+      }
+    });
+  }
+);
+
+// Get Specific Product
+app.get('/product/:productid', function (req, res) {
+   const productid = parseInt(req.params.productid);
+   Prod.getListing(productid, function (err, result){
+      if(!err){
+         if(result){
+           res.status(200).send(result);
+         }
+         else{
+           res.status(404).send("User not found");
+         }
+      } 
+      else{
+          res.status(500).send("Unknown error");
+      }
+    });
+  }
+);
+
+// Order
+app.get('/product/order/:productid/:userid', function (req, res) {
+   const productid = parseInt(req.params.productid);
+   const userid = parseInt(req.params.userid);
+
+   Prod.getOrder(productid, userid, function (err, result){
+      if(!err){
+         if(result){
+           res.status(200).send(result);
+         }
+         else{
+           res.status(404).send("User not found");
+         }
+      } 
+      else{
+          res.status(500).send("Unknown error");
+      }
+    });
+  }
+);
+
+// New Order
+app.post("/neworder/:productid/:userid", function(req,res){
+   var datapack ={
+      userid : req.body.userid,
+      productid : req.body.productid
+   }
+
+   Prod.newOrder(datapack, function(err,result){
+      console.log(result)
+      if(!err){
+         if(result){
+           res.status(200).send(result);
+         }
+         else{
+           res.status(404).send("User not found");
+         }
+      } 
+      else{
+          res.status(500).send("Unknown error");
+      }
+   })
+})
+
+// Featured
+app.get('/featured', function (req, res) {
+
+   Prod.getFeatured(function (err, result){
+      console.log(result)
+      if(!err){
+         if(result){
+           res.status(200).send(result);
+         }
+         else{
+           res.status(404).send("User not found");
+         }
+      } 
+      else{
+          res.status(500).send("Unknown error");
+      }
+    });
+  }
+);
+
+module.exports = app;
